@@ -7,39 +7,31 @@
  */
 
 import { Game } from 'boardgame.io/core';
+import * as constant from './constant'
 
-function IsVictory(cells) {
-    const positions = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6],
-    ];
+function IsVictory(cells, currentPlayer) {
 
-    for (let pos of positions) {
-        const symbol = cells[pos[0]];
-        let winner = symbol;
-        for (let i of pos) {
-            if (cells[i] != symbol) {
-                winner = null;
-                break;
-            }
-        }
-        if (winner != null) return true;
+    var getNthLineIdx = null;
+    if (currentPlayer === "0") {
+        getNthLineIdx = constant.getnthColIdx;
+    } else {
+        getNthLineIdx = constant.getnthRowIdx;
     }
 
-    return false;
+    if (getNthLineIdx(0).map(x => cells[x]).filter(x => !!x).length === 0 &&
+        getNthLineIdx(constant.boardsize - 1).map(x => cells[x]).filter(x => !!x).length === 0) {
+            return false;
+    }
+
+    return true;
+
 }
 
-const TicTacToe = Game({
-    name: 'tic-tac-toe',
+const TwixT = Game({
+    name: 'TwixT',
 
     setup: () => ({
-        cells: Array(9).fill(null),
+        cells: Array(Math.pow(constant.boardsize, 2)).fill(null),
     }),
 
     moves: {
@@ -49,7 +41,7 @@ const TicTacToe = Game({
             if (cells[id] === null) {
                 cells[id] = ctx.currentPlayer;
             }
-
+            
             return { ...G, cells };
         },
     },
@@ -58,7 +50,7 @@ const TicTacToe = Game({
         movesPerTurn: 1,
 
         endGameIf: (G, ctx) => {
-            if (IsVictory(G.cells)) {
+            if (IsVictory(G.cells, ctx.currentPlayer)) {
                 return { winner: ctx.currentPlayer };
             }
             if (G.cells.filter(c => c === null).length == 0) {
@@ -68,4 +60,4 @@ const TicTacToe = Game({
     },
 });
 
-export default TicTacToe;
+export default TwixT;

@@ -9,6 +9,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './board.css';
+import * as constant from './constant'
 
 class Board extends React.Component {
     static propTypes = {
@@ -20,6 +21,11 @@ class Board extends React.Component {
         isMultiplayer: PropTypes.bool,
     };
 
+    constructor() {
+        super()
+        this.boardsize = constant.boardsize;
+    }
+
     onClick = id => {
         if (this.isActive(id)) {
             this.props.moves.clickCell(id);
@@ -28,16 +34,21 @@ class Board extends React.Component {
 
     isActive(id) {
         if (!this.props.isActive) return false;
+
+        let [row, col] = constant.getCord(id);
+        let edge = this.props.ctx.currentPlayer === "0" ? row : col;
+        if (edge === 0 || edge === this.boardsize - 1) return false;
+
         if (this.props.G.cells[id] !== null) return false;
         return true;
     }
 
     render() {
         let tbody = [];
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < constant.boardsize; i++) {
             let cells = [];
-            for (let j = 0; j < 3; j++) {
-                const id = 3 * i + j;
+            for (let j = 0; j < constant.boardsize; j++) {
+                const id = constant.getIndex(i, j);
                 cells.push(
                     <td
                         key={id}
